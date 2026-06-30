@@ -3,417 +3,145 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MMYX Ambassadors — Live Leaderboard</title>
+<title>Aureus Star Search — Live Leaderboard</title>
 <style>
   :root {
-    --gold:#E0A52E; --dgold:#C2861C; --cream:#F6EAD2; --card:#FBF1DA; --dark:#2B2016;
-    --bg:#FFFDF9; --mute:#9C8A6E; --line:#E8D6AC; --brown:#4A3B2A;
-    --green:#3F7D5A; --greenbg:#ECF4EF; --blue:#4E86C7;
-    --serif:Georgia,'Times New Roman',serif;
-    --sans:'Segoe UI',system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    --gold:#E8B84B; --gold-deep:#8A6D1F; --gold-soft:#FBF6E9; --gold-pill:#FCEFCB;
+    --ink:#2B2B2B; --grey:#6B6B6B; --line:#EFE6CE; --white:#FFFFFF;
+    --sans:'Poppins','Segoe UI',system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
   }
   * { box-sizing:border-box; margin:0; padding:0; }
-  body {
-    font-family:var(--sans);
-    background: radial-gradient(ellipse 120% 60% at 50% -5%, #FBF1DA 0%, #FFFDF9 55%);
-    min-height:100vh;
-    padding: 24px 16px 60px;
-    color:var(--dark);
-  }
-  .wrap { max-width:760px; margin:0 auto; }
+  body { font-family:var(--sans); background:var(--white); color:var(--ink); min-height:100vh; padding:0 0 60px; }
+  .topbar { height:6px; background:var(--gold); width:100%; }
+  .wrap { max-width:780px; margin:0 auto; padding:0 20px; }
 
-  /* Header */
-  .head { text-align:center; margin-bottom:8px; }
-  .wordmark {
-    font-family:var(--serif); font-weight:bold; letter-spacing:4px;
-    color:var(--dgold); font-size:18px;
-  }
-  .wordmark span {
-    display:block; font-family:var(--sans); font-weight:700;
-    letter-spacing:5px; font-size:9px; color:var(--mute); margin-top:3px;
-  }
-  h1 {
-    font-family:var(--serif); font-size:30px; color:var(--dark);
-    margin-top:14px; font-weight:bold;
-  }
-  .sub { font-size:13px; color:var(--mute); margin-top:4px; }
+  .head { text-align:center; padding:42px 0 8px; }
+  .eyebrow { font-size:13px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--gold-deep); margin-bottom:14px; }
+  h1 { font-size:42px; font-weight:800; color:var(--ink); line-height:1.05; letter-spacing:-1px; }
+  h1 em { font-style:italic; color:var(--gold-deep); }
+  .sub { font-size:15px; color:var(--grey); margin-top:14px; }
 
-  .status {
-    display:flex; align-items:center; justify-content:center; gap:8px;
-    font-size:12px; color:var(--mute); margin:14px 0 22px;
-  }
-  .dot { width:8px; height:8px; border-radius:50%; background:var(--green); }
+  .status { display:flex; align-items:center; justify-content:center; gap:9px; font-size:13px; color:var(--grey); margin:22px 0 28px; }
+  .dot { width:9px; height:9px; border-radius:50%; background:#4caf50; }
   .dot.loading { background:var(--gold); animation:pulse 1s infinite; }
   .dot.error { background:#C0392B; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
-  .refresh-btn {
-    background:var(--dark); color:#fff; border:none; cursor:pointer;
-    font-family:var(--sans); font-weight:700; font-size:12px;
-    padding:6px 14px; border-radius:999px; margin-left:6px;
-    transition:opacity .15s;
-  }
-  .refresh-btn:hover { opacity:.85; }
+  .refresh-btn { background:var(--gold); color:var(--ink); border:none; cursor:pointer; font-family:var(--sans); font-weight:700; font-size:12px; padding:7px 18px; border-radius:999px; margin-left:8px; transition:filter .15s; }
+  .refresh-btn:hover { filter:brightness(.95); }
 
-  /* Boards layout */
-  .boards { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
-  @media(max-width:620px){ .boards { grid-template-columns:1fr; } }
+  .boards { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media(max-width:640px){ .boards { grid-template-columns:1fr; } }
+  .board { background:var(--white); border:1px solid var(--line); border-radius:22px; overflow:hidden; box-shadow:0 10px 28px rgba(138,109,31,.07); }
+  .board-head { padding:18px 20px 14px; text-align:center; background:var(--gold-soft); border-bottom:1px solid var(--line); }
+  .board-head .pill { display:inline-block; background:var(--gold); color:var(--ink); font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:5px 16px; border-radius:999px; margin-bottom:10px; }
+  .board-head h2 { font-size:22px; font-weight:800; color:var(--ink); }
+  .board-head h2 em { font-style:italic; color:var(--gold-deep); }
+  .board-head p { font-size:12px; color:var(--grey); margin-top:3px; }
+  .board-body { padding:12px 14px 16px; }
 
-  .board {
-    background:#fff; border:1px solid var(--line); border-radius:20px;
-    overflow:hidden; box-shadow:0 12px 30px rgba(74,59,42,.08);
-  }
-  .board-head {
-    padding:16px 18px 12px; background:linear-gradient(160deg,#2B2016,#3A2A18);
-  }
-  .board-head .icon { font-size:22px; }
-  .board-head h2 {
-    font-family:var(--serif); font-size:18px; color:var(--gold);
-    margin-top:4px; font-weight:bold;
-  }
-  .board-head p { font-size:11px; color:#D8C9AE; margin-top:2px; }
+  .row { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:14px; margin-bottom:6px; background:var(--white); border:1px solid var(--line); }
+  .row.top1 { background:var(--gold-soft); border-color:var(--gold); }
+  .pos { width:28px; height:28px; border-radius:50%; flex:0 0 auto; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; background:var(--gold-pill); color:var(--gold-deep); }
+  .row.top1 .pos { background:var(--gold); color:var(--ink); }
+  .row.top2 .pos { background:#E3E3E3; color:#666; }
+  .row.top3 .pos { background:#F0DBB0; color:var(--gold-deep); }
+  .nm { flex:1; font-weight:600; font-size:14.5px; color:var(--ink); }
+  .vl { font-weight:800; font-size:19px; color:var(--gold-deep); }
 
-  .board-body { padding:10px 12px 14px; }
-
-  .row {
-    display:flex; align-items:center; gap:11px;
-    padding:10px 10px; border-radius:11px; margin-bottom:5px;
-    background:#fff; border:1px solid var(--line);
-    transition:background .2s;
-  }
-  .row.top1 { background:linear-gradient(135deg,#FFF8E8,#FBF1DA); border-color:var(--gold); }
-  .pos {
-    width:26px; height:26px; border-radius:50%;
-    background:var(--cream); color:var(--dgold);
-    font-weight:800; font-size:12px;
-    display:flex; align-items:center; justify-content:center; flex:0 0 auto;
-  }
-  .row.top1 .pos { background:var(--gold); color:#fff; }
-  .row.top2 .pos { background:#C9CDD4; color:#fff; }
-  .row.top3 .pos { background:#D8A878; color:#fff; }
-  .nm { flex:1; font-weight:600; font-size:14px; }
-  .vl { font-family:var(--serif); font-weight:bold; color:var(--dgold); font-size:18px; }
-
-  .empty { text-align:center; color:var(--mute); font-size:13px; padding:30px 10px; }
-  .err-box {
-    background:#FDF3F2; border:1px solid #E8C0BB; border-radius:12px;
-    padding:16px; font-size:13px; color:#8B2E26; line-height:1.5;
-    margin-top:10px;
-  }
-
-  /* Prizes */
-  .prizes-wrap { margin-top:30px; }
-  .prizes-title {
-    text-align:center; font-family:var(--serif); font-size:24px;
-    color:var(--dark); font-weight:bold; margin-bottom:4px;
-  }
-  .prizes-sub { text-align:center; font-size:12px; color:var(--mute); margin-bottom:20px; }
-
-  .stream {
-    background:#fff; border:1px solid var(--line); border-radius:18px;
-    overflow:hidden; margin-bottom:16px; box-shadow:0 8px 22px rgba(74,59,42,.06);
-  }
-  .stream-head { padding:14px 18px; display:flex; align-items:center; gap:10px; }
-  .stream-head .s-icon { font-size:20px; }
-  .stream-head .s-title { font-family:var(--serif); font-weight:bold; font-size:16px; }
-  .stream-head .s-cond { font-size:11px; color:var(--mute); margin-top:1px; }
-  .stream.a .stream-head { background:var(--greenbg); }
-  .stream.b .stream-head { background:#EEF2FA; }
-  .stream.c .stream-head { background:linear-gradient(135deg,#2B2016,#3A2A18); }
-  .stream.c .s-title { color:var(--gold); }
-  .stream.c .s-cond { color:#D8C9AE; }
-
-  .prize-list { padding:8px 14px 14px; }
-  .prize-item {
-    display:flex; align-items:center; gap:12px;
-    padding:9px 6px; border-bottom:1px solid #F0E9D6;
-  }
-  .prize-item:last-child { border-bottom:none; }
-  .prize-rank {
-    width:30px; height:30px; border-radius:50%; flex:0 0 auto;
-    display:flex; align-items:center; justify-content:center; font-size:15px;
-    background:var(--cream);
-  }
-  .prize-info b { font-size:13.5px; color:var(--dark); }
-  .prize-info p { font-size:11.5px; color:var(--brown); margin-top:1px; }
-  .prize-val { margin-left:auto; font-family:var(--serif); font-weight:bold; font-size:13px; color:var(--dgold); white-space:nowrap; }
-
-  .baseline-card {
-    background:var(--dark); border-radius:14px; padding:14px 18px;
-    display:flex; align-items:center; gap:14px; margin-top:4px;
-  }
-  .baseline-card .b-icon { font-size:24px; }
-  .baseline-card b { color:#fff; font-size:15px; font-family:var(--serif); }
-  .baseline-card p { color:#E9DCC2; font-size:12px; margin-top:2px; }
-
-  .foot { text-align:center; font-size:11px; color:var(--mute); margin-top:28px; line-height:1.6; }
+  .empty { text-align:center; color:var(--grey); font-size:13px; padding:34px 10px; }
+  .err-box { background:#FDF3F2; border:1px solid #E8C0BB; border-radius:14px; padding:18px; font-size:13px; color:#8B2E26; line-height:1.5; margin-top:16px; }
+  .foot { text-align:center; font-size:12px; color:var(--grey); margin-top:34px; line-height:1.7; }
   @media(prefers-reduced-motion:reduce){ *{animation:none!important;transition:none!important} }
 </style>
 </head>
 <body>
+<div class="topbar"></div>
 <div class="wrap">
   <div class="head">
-    <div class="wordmark">AUREUS<span>MMYX AMBASSADORS</span></div>
+    <div class="eyebrow">AUREUS · MMYX AMBASSADORS</div>
     <h1>Live Leaderboard</h1>
     <div class="sub">Updated automatically from the tracker</div>
   </div>
-
   <div class="status">
     <span class="dot loading" id="statusDot"></span>
     <span id="statusText">Loading latest numbers…</span>
     <button class="refresh-btn" onclick="loadData()">Refresh</button>
   </div>
-
   <div class="boards">
     <div class="board">
       <div class="board-head">
-        <div class="icon">📸</div>
-        <h2>Most Posts</h2>
+        <h2>📸 Most Posts</h2>
         <p>Ranked by total videos posted</p>
       </div>
-      <div class="board-body" id="postsBoard">
-        <div class="empty">Loading…</div>
-      </div>
+      <div class="board-body" id="postsBoard"><div class="empty">Loading…</div></div>
     </div>
-
     <div class="board">
       <div class="board-head">
-        <div class="icon">✈️</div>
-        <h2>Top Enrolments</h2>
-        <p>Ranked by enrolments · drives S$128 + grand prizes</p>
+        <h2>✈️ Top Enrolments</h2>
+        <p>Ranked by enrolments</p>
       </div>
-      <div class="board-body" id="enrolBoard">
-        <div class="empty">Loading…</div>
-      </div>
+      <div class="board-body" id="enrolBoard"><div class="empty">Loading…</div></div>
     </div>
   </div>
-
   <div id="errZone"></div>
-
-  <!-- Prizes -->
-  <div class="prizes-wrap">
-    <div class="prizes-title">🏆 What You Can Win</div>
-    <div class="prizes-sub">Prizes run throughout the programme · 1 July – 31 October</div>
-
-    <!-- Stream A -->
-    <div class="stream a">
-      <div class="stream-head">
-        <span class="s-icon">🤝</span>
-        <div>
-          <div class="s-title">Shared Prizes</div>
-          <div class="s-cond">When your student wins, you win too — automatically</div>
-        </div>
-      </div>
-      <div class="prize-list">
-        <div class="prize-item">
-          <div class="prize-rank">🧸</div>
-          <div class="prize-info"><b>Weekly</b><p>Your student wins the week → a Bumblebeats set + social feature</p></div>
-        </div>
-        <div class="prize-item">
-          <div class="prize-rank">💰</div>
-          <div class="prize-info"><b>Monthly</b><p>Your student wins the month → S$200 to you</p></div>
-        </div>
-        <div class="prize-item">
-          <div class="prize-rank">✈️</div>
-          <div class="prize-info"><b>Grand</b><p>Mirrors your student's win — Disney Cruise / Banyan Tree Mandai 3D2N / MBS staycation 2D1N (2 adults)</p></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Stream B -->
-    <div class="stream b">
-      <div class="stream-head">
-        <span class="s-icon">📸</span>
-        <div>
-          <div class="s-title">Most Posts</div>
-          <div class="s-cond">Activates at 1,000 total posts · min. 10 posts each</div>
-        </div>
-      </div>
-      <div class="prize-list">
-        <div class="prize-item">
-          <div class="prize-rank">🥇</div>
-          <div class="prize-info"><b>1st — iPhone 17 (256GB)</b></div>
-        </div>
-        <div class="prize-item">
-          <div class="prize-rank">🥈</div>
-          <div class="prize-info"><b>2nd — Nintendo Switch 2</b></div>
-        </div>
-        <div class="prize-item">
-          <div class="prize-rank">🥉</div>
-          <div class="prize-info"><b>3rd — AirPods Pro 3</b></div>
-        </div>
-        <div class="prize-item">
-          <div class="prize-rank">🎡</div>
-          <div class="prize-info"><b>Group bonus</b><p>Highest-posting group of 10 in first 7 days → USS day out</p></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Stream C -->
-    <div class="stream c">
-      <div class="stream-head">
-        <span class="s-icon">🏆</span>
-        <div>
-          <div class="s-title">Top Enrolments</div>
-          <div class="s-cond">Activates at 200 total referrals · min. 5 each</div>
-        </div>
-      </div>
-      <div class="prize-list">
-        <div class="prize-item">
-          <div class="prize-rank">🥇</div>
-          <div class="prize-info"><b>1st — Tokyo Disneyland (5D4N)</b><p>Flights + 4 nights + 2-day park tickets, 2 pax</p></div>
-        </div>
-        <div class="prize-item">
-          <div class="prize-rank">🥈</div>
-          <div class="prize-info"><b>2nd — Shanghai Disneyland (4D3N)</b><p>Flights + hotel + 1-day ticket, 2 pax</p></div>
-        </div>
-        <div class="prize-item">
-          <div class="prize-rank">🥉</div>
-          <div class="prize-info"><b>3rd — Hong Kong Disneyland (3D2N)</b><p>Flights + hotel + 1-day ticket, 2 pax</p></div>
-        </div>
-        <div class="prize-item">
-          <div class="prize-rank">📱</div>
-          <div class="prize-info"><b>4th — iPhone 17 Pro (256GB)</b></div>
-        </div>
-        <div class="prize-item">
-          <div class="prize-rank">💻</div>
-          <div class="prize-info"><b>5th — MacBook Air M4 (256GB)</b></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Baseline -->
-    <div class="baseline-card">
-      <span class="b-icon">🪙</span>
-      <div>
-        <b>S$128 per enrolment — always</b>
-        <p>Paid on every enrolment. Uncapped. On top of all prizes above.</p>
-      </div>
-    </div>
-  </div>
-
   <div class="foot">
     MMYX Ambassadors · Aureus Academy<br>
     Leaderboard reads live from the published tracker. Edit the sheet, refresh to update.
   </div>
 </div>
-
 <script>
-  // ── Your published Google Sheet CSV ──────────────────────────────────────
   const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS1-uTNo8pZLJLzjqy0Iwq_u7RtW65zygFFsphHxPFhocF8N166k01FlKdJod30WrCmFV2gdLimk8OT/pub?output=csv';
-
-  // ── CSV parser (handles quoted fields) ───────────────────────────────────
-  function parseCSV(text) {
-    const rows = [];
-    let row = [], field = '', inQuotes = false;
-    for (let i = 0; i < text.length; i++) {
-      const c = text[i], next = text[i+1];
-      if (inQuotes) {
-        if (c === '"' && next === '"') { field += '"'; i++; }
-        else if (c === '"') { inQuotes = false; }
-        else { field += c; }
-      } else {
-        if (c === '"') { inQuotes = true; }
-        else if (c === ',') { row.push(field); field = ''; }
-        else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
-        else if (c === '\r') { /* skip */ }
-        else { field += c; }
-      }
-    }
-    if (field.length || row.length) { row.push(field); rows.push(row); }
-    return rows.filter(r => r.some(c => c.trim() !== ''));
-  }
-
-  // ── Flexible column matching ─────────────────────────────────────────────
-  function findCol(headers, options) {
-    const lower = headers.map(h => h.trim().toLowerCase());
-    for (const opt of options) {
-      const idx = lower.indexOf(opt);
-      if (idx !== -1) return idx;
-    }
-    // partial match
-    for (let i = 0; i < lower.length; i++) {
-      if (options.some(opt => lower[i].includes(opt))) return i;
-    }
-    return -1;
-  }
-
-  function setStatus(state, text) {
-    const dot = document.getElementById('statusDot');
-    dot.className = 'dot ' + (state === 'ok' ? '' : state);
-    document.getElementById('statusText').textContent = text;
-  }
-
-  function renderBoard(elId, list, valueKey) {
-    const el = document.getElementById(elId);
-    el.innerHTML = '';
-    if (!list.length) {
-      el.innerHTML = '<div class="empty">No data yet</div>';
-      return;
-    }
-    list.forEach((r, i) => {
-      const div = document.createElement('div');
-      let cls = 'row';
-      if (i === 0) cls += ' top1';
-      else if (i === 1) cls += ' top2';
-      else if (i === 2) cls += ' top3';
-      div.className = cls;
-      div.innerHTML =
-        '<div class="pos">' + (i+1) + '</div>' +
-        '<div class="nm">' + escapeHtml(r.name) + '</div>' +
-        '<div class="vl">' + r[valueKey] + '</div>';
-      el.appendChild(div);
-    });
-  }
-
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-  }
-
-  async function loadData() {
-    setStatus('loading', 'Loading latest numbers…');
-    document.getElementById('errZone').innerHTML = '';
-    try {
-      const res = await fetch(CSV_URL + '&_=' + Date.now());
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const text = await res.text();
-      const rows = parseCSV(text);
-      if (rows.length < 2) throw new Error('Sheet appears empty');
-
-      const headers = rows[0];
-      const nameIdx = findCol(headers, ['name', 'teacher', 'family']);
-      const postsIdx = findCol(headers, ['posts', 'post', 'videos']);
-      const enrolIdx = findCol(headers, ['enrolments', 'enrolment', 'enrollments', 'enrol', 'enroll']);
-
-      if (nameIdx === -1) throw new Error('Could not find a Name column');
-
-      const data = rows.slice(1).map(r => ({
-        name: (r[nameIdx] || '').trim(),
-        posts: parseInt((r[postsIdx] || '0').replace(/[^0-9-]/g,'')) || 0,
-        enrol: parseInt((r[enrolIdx] || '0').replace(/[^0-9-]/g,'')) || 0,
-      })).filter(d => d.name);
-
-      const byPosts = [...data].sort((a,b) => b.posts - a.posts);
-      const byEnrol = [...data].sort((a,b) => b.enrol - a.enrol);
-
-      renderBoard('postsBoard', byPosts, 'posts');
-      renderBoard('enrolBoard', byEnrol, 'enrol');
-
-      const now = new Date();
-      setStatus('ok', 'Live · updated ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
-    } catch (err) {
-      setStatus('error', 'Could not load data');
-      document.getElementById('errZone').innerHTML =
-        '<div class="err-box"><b>Couldn\'t read the sheet.</b><br>' +
-        'Check that the Google Sheet is still published to web as CSV, and that it has columns named Name, Posts, and Enrolments.<br><br>' +
-        'Technical detail: ' + escapeHtml(err.message) + '</div>';
-      document.getElementById('postsBoard').innerHTML = '<div class="empty">—</div>';
-      document.getElementById('enrolBoard').innerHTML = '<div class="empty">—</div>';
+  function parseCSV(text){const rows=[];let row=[],field='',q=false;
+    for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];
+      if(q){if(c==='"'&&n==='"'){field+='"';i++;}else if(c==='"'){q=false;}else{field+=c;}}
+      else{if(c==='"'){q=true;}else if(c===','){row.push(field);field='';}
+        else if(c==='\n'){row.push(field);rows.push(row);row=[];field='';}
+        else if(c==='\r'){}else{field+=c;}}}
+    if(field.length||row.length){row.push(field);rows.push(row);}
+    return rows.filter(r=>r.some(c=>c.trim()!==''));}
+  function findCol(h,opts){const l=h.map(x=>x.trim().toLowerCase());
+    for(const o of opts){const i=l.indexOf(o);if(i!==-1)return i;}
+    for(let i=0;i<l.length;i++){if(opts.some(o=>l[i].includes(o)))return i;}return -1;}
+  function setStatus(s,t){document.getElementById('statusDot').className='dot '+(s==='ok'?'':s);
+    document.getElementById('statusText').textContent=t;}
+  function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+  function renderBoard(elId,list,key){const el=document.getElementById(elId);el.innerHTML='';
+    if(!list.length){el.innerHTML='<div class="empty">No data yet</div>';return;}
+    list.forEach((r,i)=>{const d=document.createElement('div');
+      let cls='row';if(i===0)cls+=' top1';else if(i===1)cls+=' top2';else if(i===2)cls+=' top3';
+      d.className=cls;
+      d.innerHTML='<div class="pos">'+(i+1)+'</div><div class="nm">'+esc(r.name)+'</div><div class="vl">'+r[key]+'</div>';
+      el.appendChild(d);});}
+  async function loadData(){
+    setStatus('loading','Loading latest numbers…');
+    document.getElementById('errZone').innerHTML='';
+    try{
+      const res=await fetch(CSV_URL+'&_='+Date.now());
+      if(!res.ok)throw new Error('HTTP '+res.status);
+      const rows=parseCSV(await res.text());
+      if(rows.length<2)throw new Error('Sheet appears empty');
+      const h=rows[0];
+      const ni=findCol(h,['name','teacher','family']);
+      const pi=findCol(h,['posts','post','videos']);
+      const ei=findCol(h,['enrolments','enrolment','enrollments','enrol','enroll']);
+      if(ni===-1)throw new Error('Could not find a Name column');
+      const data=rows.slice(1).map(r=>({name:(r[ni]||'').trim(),
+        posts:parseInt((r[pi]||'0').replace(/[^0-9-]/g,''))||0,
+        enrol:parseInt((r[ei]||'0').replace(/[^0-9-]/g,''))||0,
+      })).filter(d=>d.name);
+      renderBoard('postsBoard',[...data].sort((a,b)=>b.posts-a.posts),'posts');
+      renderBoard('enrolBoard',[...data].sort((a,b)=>b.enrol-a.enrol),'enrol');
+      const now=new Date();
+      setStatus('ok','Live · updated '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
+    }catch(err){
+      setStatus('error','Could not load data');
+      document.getElementById('errZone').innerHTML='<div class="err-box"><b>Couldn\'t read the sheet.</b><br>Check the Google Sheet is still published to web as CSV with columns Name, Posts, Enrolments.<br><br>Technical detail: '+esc(err.message)+'</div>';
+      document.getElementById('postsBoard').innerHTML='<div class="empty">—</div>';
+      document.getElementById('enrolBoard').innerHTML='<div class="empty">—</div>';
     }
   }
-
-  // Initial load + auto-refresh every 60 seconds
   loadData();
-  setInterval(loadData, 60000);
+  setInterval(loadData,60000);
 </script>
 </body>
 </html>
