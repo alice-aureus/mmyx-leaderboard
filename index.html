@@ -133,7 +133,7 @@
       const centreMap={};
       data.forEach(d=>{ if(d.centre){ centreMap[d.centre]=(centreMap[d.centre]||0)+d.posts; } });
       const centres=Object.keys(centreMap).map(k=>({name:k,posts:centreMap[k]})).sort((a,b)=>b.posts-a.posts);
-      renderBoard('centreBoard',centres,'posts');
+      renderBoard('centreBoard',centres.slice(0,10),'posts');
       const now=new Date();
       setStatus('ok','Live · updated '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
     }catch(err){
