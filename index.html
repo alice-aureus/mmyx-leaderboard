@@ -127,7 +127,7 @@
         centre:(ci!==-1?(r[ci]||''):'').trim(),
         posts:parseInt((r[pi]||'0').replace(/[^0-9-]/g,''))||0,
       })).filter(d=>d.name);
-      renderBoard('postsBoard',[...data].sort((a,b)=>b.posts-a.posts).slice(0,10),'posts');
+      renderBoard('postsBoard',[...data].sort((a,b)=>b.posts-a.posts).slice(0,15),'posts');
 
       // Aggregate posts by centre
       const centreMap={};
